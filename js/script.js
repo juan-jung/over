@@ -106,55 +106,73 @@ function findPossibleExpressions(numbers, operators, target) {
         return result;
     }
 
-    // 숫자 연결 시도 (재귀적으로 모든 가능한 연결 시도)
-    function tryConnectNumbers(nums) {
-        const results = new Set();
+    // 숫자 연결 (예: 1,0,1,8 -> 1018)
+    function connectNumbers(numArray) {
+        // 모든 가능한 숫자 연결 조합을 생성
+        const result = [];
         
-        // 연결하지 않은 경우
-        results.add(nums.join(','));
+        // 기본 케이스: 연결 없이 원래 배열 반환
+        result.push([...numArray.map(n => parseInt(n))]);
         
-        // 두 개 이상의 숫자가 있는 경우에만 연결 시도
-        if (nums.length >= 2) {
-            // 모든 가능한 두 숫자의 조합 시도
-            for (let i = 0; i < nums.length; i++) {
-                for (let j = i + 1; j < nums.length; j++) {
-                    const combined = parseInt(nums[i].toString() + nums[j].toString());
-                    
-                    // 연결된 숫자가 20 이하인 경우만 고려
-                    if (combined <= 20) {
-                        // 나머지 숫자들로 새로운 배열 생성
-                        const remaining = nums.filter((_, index) => index !== i && index !== j);
-                        const newNums = [...remaining];
-                        newNums.push(combined);
+        // 2개 이상의 숫자가 있을 경우에만 연결 시도
+        if (numArray.length >= 2) {
+            // 모든 가능한 숫자 쌍 시도
+            for (let i = 0; i < numArray.length; i++) {
+                for (let j = 0; j < numArray.length; j++) {
+                    if (i !== j) {
+                        // 두 숫자 연결
+                        const connected = numArray[i] + numArray[j];
+                        const newArray = [...numArray];
+                        newArray.splice(Math.max(i, j), 1);
+                        newArray.splice(Math.min(i, j), 1, connected);
                         
-                        // 재귀적으로 나머지 숫자들에 대해 연결 시도
-                        const subResults = tryConnectNumbers(newNums);
-                        subResults.forEach(result => results.add(result));
+                        // 재귀적으로 더 많은 연결 시도
+                        const moreConnections = connectNumbers(newArray);
+                        result.push(...moreConnections);
+                        
+                        // 순서를 바꿔서도 연결 시도 (예: 10+18 vs 18+10)
+                        const reversedConnected = numArray[j] + numArray[i];
+                        const reversedArray = [...numArray];
+                        reversedArray.splice(Math.max(i, j), 1);
+                        reversedArray.splice(Math.min(i, j), 1, reversedConnected);
+                        
+                        const moreReversedConnections = connectNumbers(reversedArray);
+                        result.push(...moreReversedConnections);
                     }
                 }
             }
         }
         
-        // 문자열을 다시 배열로 변환하여 반환
-        return Array.from(results).map(str => str.split(',').map(Number));
+        // 중복 제거를 위해 문자열화한 Set 사용
+        const uniqueResults = new Set(result.map(arr => JSON.stringify(arr)));
+        return Array.from(uniqueResults).map(str => JSON.parse(str));
     }
 
     // 숫자 순열 생성
     const numberPermutations = getPermutations(numbers);
     
-    // 연산자 조합 생성 (숫자 개수 - 1)
-    const operatorCombinations = getOperatorCombinations(numbers.length - 1);
+    // 연산자 조합 생성
+    let maxOperators = numbers.length - 1;
+    const operatorCombinations = [];
+    
+    // 연산자의 조합 수가 1부터 maxOperators까지 다양할 수 있음
+    for (let i = 1; i <= maxOperators; i++) {
+        operatorCombinations.push(...getOperatorCombinations(i));
+    }
 
     // 모든 가능한 조합 시도
-    for (const nums of numberPermutations) {
-        // 숫자 연결 시도
-        const connectedNumbers = tryConnectNumbers(nums);
+    for (const numPerm of numberPermutations) {
+        // 숫자 연결 조합 생성
+        const connectedNumberSets = connectNumbers(numPerm);
         
-        for (const connected of connectedNumbers) {
+        for (const connectedNumbers of connectedNumberSets) {
             for (const ops of operatorCombinations) {
+                // 숫자와 연산자 조합이 유효한지 확인
+                if (ops.length !== connectedNumbers.length - 1) continue;
+                
                 const expression = [];
-                for (let i = 0; i < connected.length; i++) {
-                    expression.push(connected[i]);
+                for (let i = 0; i < connectedNumbers.length; i++) {
+                    expression.push(connectedNumbers[i]);
                     if (i < ops.length) {
                         expression.push(ops[i]);
                     }
@@ -183,7 +201,7 @@ calculateButton.addEventListener('click', () => {
     }
 
     // 숫자와 연산자 분리
-    const numbers = selectedItems.filter(item => !isNaN(item));
+    const numbers = selectedItems.filter(item => !isNaN(item)).map(item => item.toString());
     const operators = selectedItems.filter(item => isNaN(item));
 
     if (numbers.length === 0) {
@@ -224,9 +242,11 @@ function calculateExpression(items) {
                 result -= operand;
                 break;
             case '×':
+            case '*':  // * 기호도 처리
                 result *= operand;
                 break;
             case '÷':
+            case '/':  // / 기호도 처리
                 if (operand === 0) {
                     return NaN;
                 }
@@ -249,4 +269,4 @@ targetNumberInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         calculateButton.click();
     }
-}); 
+});
