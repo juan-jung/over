@@ -32,13 +32,33 @@ function addSelectedItem(item) {
     if (isNumber && lastItemWasNumber && selectedItems.length > 0) {
         // 마지막 항목이 숫자이고 현재 항목도 숫자인 경우
         const lastItem = selectedItems[selectedItems.length - 1];
-        selectedItems[selectedItems.length - 1] = lastItem + item;
+        const combinedNumber = lastItem + item;
+        
+        // 연결된 숫자가 20 이하인 경우에만 연결
+        if (parseInt(combinedNumber) <= 20) {
+            selectedItems[selectedItems.length - 1] = combinedNumber;
+        } else {
+            selectedItems.push(item);
+        }
     } else {
         selectedItems.push(item);
     }
     
     lastItemWasNumber = isNumber;
-    updateSelectedItemsDisplay();
+    updateSelectedItems();
+}
+
+// 선택된 항목 업데이트
+function updateSelectedItems() {
+    selectedItemsContainer.innerHTML = '';
+    
+    selectedItems.forEach((item, index) => {
+        const itemSpan = document.createElement('span');
+        itemSpan.className = 'selected-item';
+        itemSpan.textContent = item;
+        itemSpan.onclick = () => removeSelectedItem(index);
+        selectedItemsContainer.appendChild(itemSpan);
+    });
 }
 
 // 선택된 항목 삭제
@@ -46,28 +66,7 @@ function removeSelectedItem(index) {
     selectedItems.splice(index, 1);
     // 마지막 항목이 숫자인지 확인
     lastItemWasNumber = selectedItems.length > 0 && !isNaN(selectedItems[selectedItems.length - 1]);
-    updateSelectedItemsDisplay();
-}
-
-// 선택된 항목 표시 업데이트
-function updateSelectedItemsDisplay() {
-    selectedItemsContainer.innerHTML = '';
-    selectedItems.forEach((item, index) => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'selected-item';
-        
-        // 숫자인 경우 각 자릿수를 개별적으로 표시
-        if (!isNaN(item)) {
-            itemElement.innerHTML = item.split('').map(digit => 
-                `<span class="digit">${digit}</span>`
-            ).join('');
-        } else {
-            itemElement.textContent = item;
-        }
-        
-        itemElement.addEventListener('click', () => removeSelectedItem(index));
-        selectedItemsContainer.appendChild(itemElement);
-    });
+    updateSelectedItems();
 }
 
 // 가능한 모든 수식 조합 찾기
@@ -107,6 +106,39 @@ function findPossibleExpressions(numbers, operators, target) {
         return result;
     }
 
+    // 숫자 연결 시도 (재귀적으로 모든 가능한 연결 시도)
+    function tryConnectNumbers(nums) {
+        const results = new Set();
+        
+        // 연결하지 않은 경우
+        results.add(nums.join(','));
+        
+        // 두 개 이상의 숫자가 있는 경우에만 연결 시도
+        if (nums.length >= 2) {
+            // 모든 가능한 두 숫자의 조합 시도
+            for (let i = 0; i < nums.length; i++) {
+                for (let j = i + 1; j < nums.length; j++) {
+                    const combined = parseInt(nums[i].toString() + nums[j].toString());
+                    
+                    // 연결된 숫자가 20 이하인 경우만 고려
+                    if (combined <= 20) {
+                        // 나머지 숫자들로 새로운 배열 생성
+                        const remaining = nums.filter((_, index) => index !== i && index !== j);
+                        const newNums = [...remaining];
+                        newNums.push(combined);
+                        
+                        // 재귀적으로 나머지 숫자들에 대해 연결 시도
+                        const subResults = tryConnectNumbers(newNums);
+                        subResults.forEach(result => results.add(result));
+                    }
+                }
+            }
+        }
+        
+        // 문자열을 다시 배열로 변환하여 반환
+        return Array.from(results).map(str => str.split(',').map(Number));
+    }
+
     // 숫자 순열 생성
     const numberPermutations = getPermutations(numbers);
     
@@ -115,14 +147,14 @@ function findPossibleExpressions(numbers, operators, target) {
 
     // 모든 가능한 조합 시도
     for (const nums of numberPermutations) {
-        for (const ops of operatorCombinations) {
-            // 숫자들을 연속해서 사용하는 모든 경우의 수 생성
-            const numberCombinations = generateNumberCombinations(nums);
-            
-            for (const numCombo of numberCombinations) {
+        // 숫자 연결 시도
+        const connectedNumbers = tryConnectNumbers(nums);
+        
+        for (const connected of connectedNumbers) {
+            for (const ops of operatorCombinations) {
                 const expression = [];
-                for (let i = 0; i < numCombo.length; i++) {
-                    expression.push(numCombo[i]);
+                for (let i = 0; i < connected.length; i++) {
+                    expression.push(connected[i]);
                     if (i < ops.length) {
                         expression.push(ops[i]);
                     }
@@ -139,34 +171,6 @@ function findPossibleExpressions(numbers, operators, target) {
         }
     }
 
-    return results;
-}
-
-// 숫자 조합 생성 (연속된 숫자 사용)
-function generateNumberCombinations(numbers) {
-    const results = [];
-    
-    function generate(current, remaining) {
-        if (remaining.length === 0) {
-            results.push([...current]);
-            return;
-        }
-
-        // 현재 숫자를 그대로 사용
-        current.push(remaining[0]);
-        generate(current, remaining.slice(1));
-        current.pop();
-
-        // 현재 숫자와 다음 숫자를 결합
-        if (remaining.length > 1) {
-            const combined = remaining[0] + remaining[1];
-            current.push(combined);
-            generate(current, remaining.slice(2));
-            current.pop();
-        }
-    }
-
-    generate([], numbers);
     return results;
 }
 
