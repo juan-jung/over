@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사칙연산 게임</title>
+    <link rel="stylesheet" href="css/math_game.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-area">
+            <!-- 선택된 숫자와 연산자 표시 영역 -->
+            <div class="selected-area">
+                <div id="selected-items"></div>
+            </div>
+
+            <!-- 답 입력 영역 -->
+            <div class="answer-area">
+                <input type="number" id="target-number" placeholder="답을 입력하세요">
+                <button id="calculate-btn">계산</button>
+            </div>
+
+            <!-- 결과 표시 영역 -->
+            <div class="result-area">
+                <div id="result"></div>
+            </div>
+
+            <!-- 숫자와 연산자 버튼 영역 -->
+            <div class="buttons-area">
+                <div class="numbers">
+                    <button class="number-btn">0</button>
+                    <button class="number-btn">1</button>
+                    <button class="number-btn">2</button>
+                    <button class="number-btn">3</button>
+                    <button class="number-btn">4</button>
+                    <button class="number-btn">5</button>
+                    <button class="number-btn">6</button>
+                    <button class="number-btn">7</button>
+                    <button class="number-btn">8</button>
+                    <button class="number-btn">9</button>
+                    <button class="number-btn">10</button>
+                    <button class="number-btn">11</button>
+                    <button class="number-btn">12</button>
+                    <button class="number-btn">13</button>
+                    <button class="number-btn">14</button>
+                    <button class="number-btn">15</button>
+                    <button class="number-btn">16</button>
+                    <button class="number-btn">17</button>
+                    <button class="number-btn">18</button>
+                    <button class="number-btn">19</button>
+                    <button class="number-btn">20</button>
+                </div>
+                <div class="operators">
+                    <button class="operator-btn">+</button>
+                    <button class="operator-btn">-</button>
+                    <button class="operator-btn">×</button>
+                    <button class="operator-btn">÷</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/math_game.js"></script>
+</body>
+</html> 

@@ -1,0 +1,225 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* 선택된 숫자와 연산자 표시 영역 */
+.selected-area {
+    min-height: 60px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.selected-item {
+    background-color: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.selected-item .digit {
+    display: inline-block;
+    padding: 2px 4px;
+    background-color: #fff;
+    border-radius: 2px;
+    min-width: 16px;
+    text-align: center;
+}
+
+.selected-item:hover {
+    background-color: #dee2e6;
+}
+
+.selected-item:hover .digit {
+    background-color: #f8f9fa;
+}
+
+/* 답 입력 영역 */
+.answer-area {
+    display: flex;
+    gap: 10px;
+}
+
+#target-number {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#calculate-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+#calculate-btn:hover {
+    background-color: #0056b3;
+}
+
+/* 결과 표시 영역 */
+.result-area {
+    min-height: 40px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+/* 숫자와 연산자 버튼 영역 */
+.buttons-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.numbers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.operators {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+
+.number-btn, .operator-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.number-btn {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+.operator-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.number-btn:hover {
+    background-color: #dee2e6;
+}
+
+.operator-btn:hover {
+    background-color: #218838;
+}
+
+/* 모바일 반응형 스타일 */
+@media screen and (max-width: 768px) {
+    .container {
+        height: 100vh;
+    }
+
+    .game-area {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .selected-area {
+        min-height: 50px;
+    }
+
+    .numbers {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .number-btn, .operator-btn {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    #target-number {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    #calculate-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .selected-item {
+        padding: 4px 8px;
+    }
+
+    .selected-item .digit {
+        padding: 1px 3px;
+        min-width: 14px;
+        font-size: 14px;
+    }
+}
+
+/* 작은 모바일 화면 */
+@media screen and (max-width: 480px) {
+    .numbers {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .number-btn, .operator-btn {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .selected-item {
+        padding: 3px 6px;
+    }
+
+    .selected-item .digit {
+        padding: 1px 2px;
+        min-width: 12px;
+        font-size: 12px;
+    }
+} 
